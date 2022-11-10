@@ -14,7 +14,7 @@ const EXPIRED_SELL_IN = 0;
 describe('Brie', () => {
     test('should not overflow upper limit of quality', () => {
         const item = new Item('brie', mockItem.sellIn, QUALITY_HIGHER_LIMIT);
-        const shop = new Shop([item]);
+        const shop = new Shop([{...item}]);
 
         const res = shop.updateQuality();
 
@@ -22,7 +22,7 @@ describe('Brie', () => {
     })
     test('should increase quality', () => {
         const item = new Item('brie', mockItem.sellIn, QUALITY_LOWER_LIMIT);
-        const shop = new Shop([item]);
+        const shop = new Shop([{...item}]);
 
         const res = shop.updateQuality();
 
@@ -32,7 +32,7 @@ describe('Brie', () => {
 describe('Sulfuras', () => {
     test('should keep the quality constant', () => {
         const item = new Item('sulfuras', QUALITY_LOWER_LIMIT, mockItem.quality);
-        const shop = new Shop([item]);
+        const shop = new Shop([{...item}]);
 
         const res = shop.updateQuality();
 
@@ -46,7 +46,7 @@ describe('Backstage_passes', () => {
 
     test('should not overflow upper limit of quality', () => {
         const item = new Item('backstage_passes', mockItem.sellIn, QUALITY_HIGHER_LIMIT);
-        const shop = new Shop([item]);
+        const shop = new Shop([{...item}]);
 
         const res = shop.updateQuality();
 
@@ -54,7 +54,7 @@ describe('Backstage_passes', () => {
     })
     test('should increase quality', () => {
         const item = new Item('backstage_passes', mockItem.sellIn, QUALITY_LOWER_LIMIT);
-        const shop = new Shop([item]);
+        const shop = new Shop([{...item}]);
 
         const res = shop.updateQuality();
 
@@ -84,7 +84,7 @@ describe('Backstage_passes', () => {
     })
     test('should drop quality to 0 when sellIn is expired', () => {
         const item = new Item('backstage_passes', EXPIRED_SELL_IN, mockItem.quality);
-        const shop = new Shop([item]);
+        const shop = new Shop([{...item}]);
 
         const res = shop.updateQuality();
 
@@ -95,7 +95,7 @@ describe('Backstage_passes', () => {
 describe('Conjured items', () => {
     test('should not overflow lower limit of quality', () => {
         const item = new Item('conjured', mockItem.sellIn, QUALITY_LOWER_LIMIT);
-        const shop = new Shop([item]);
+        const shop = new Shop([{...item}]);
 
         const res = shop.updateQuality();
 
@@ -103,7 +103,7 @@ describe('Conjured items', () => {
     })
     test('should decrease quality', () => {
         const item = new Item('conjured', mockItem.sellIn, QUALITY_HIGHER_LIMIT);
-        const shop = new Shop([item]);
+        const shop = new Shop([{...item}]);
 
         const res = shop.updateQuality();
 
@@ -148,7 +148,7 @@ describe('Conjured items', () => {
 describe('Default items', () => {
     test('should not overflow lower limit of quality', () => {
         const item = new Item(mockItem.name, mockItem.sellIn, QUALITY_LOWER_LIMIT);
-        const shop = new Shop([item]);
+        const shop = new Shop([{...item}]);
 
         const res = shop.updateQuality();
 
@@ -156,7 +156,7 @@ describe('Default items', () => {
     })
     test('should decrease quality', () => {
         const item = new Item(mockItem.name, mockItem.sellIn, QUALITY_HIGHER_LIMIT);
-        const shop = new Shop([item]);
+        const shop = new Shop([{...item}]);
 
         const res = shop.updateQuality();
 
