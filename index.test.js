@@ -29,6 +29,7 @@ describe('Brie', () => {
         expect(res[0].quality).toBeGreaterThan(QUALITY_LOWER_LIMIT);
     })
 })
+
 describe('Sulfuras', () => {
     test('should keep the quality constant', () => {
         const item = new Item('sulfuras', QUALITY_LOWER_LIMIT, mockItem.quality);
@@ -143,7 +144,6 @@ describe('Conjured items', () => {
         expect(conjuredItemQualityOffset / 2).toEqual(defualtItemQualityOffset)
     })
 })
-
 
 describe('Default items', () => {
     test('should not overflow lower limit of quality', () => {
