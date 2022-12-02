@@ -7,10 +7,10 @@ class Item {
 }
 
 const NAMES = {
-  BRIE: 'brie',
-  SULFURAS: 'sulfuras',
-  BACKSTAGE_PASSES: 'backstage_passes',
-  CONJURED: 'conjured',
+  brie: 'BRIE',
+  sulfuras: 'SULFURAS',
+  backstage_passes: 'BACKSTAGE_PASSES',
+  conjured: 'CONJURED',
 };
 const QUALITY_DELTA = 1;
 const SELLIN_DELTA = 1;
@@ -19,9 +19,9 @@ const QUALITY_HIGHER_LIMIT = 50;
 const EXPIRED_SELL_IN = 0;
 
 const highQualityPassesSellIn = 10;
-const veryHighQualitPassesSellIn = 5;
+const veryHighQualityPassesSellIn = 5;
 const highQualityMultiplier = 2;
-const veryHighQualitMultiplier = 3;
+const veryHighQualityMultiplier = 3;
 const conjuredMultiplier = 2;
   
 class Shop {
@@ -31,107 +31,48 @@ class Shop {
     _isQualityValid(quality) {
       return quality <= QUALITY_HIGHER_LIMIT && quality >= QUALITY_LOWER_LIMIT;
     }
-    /* updateQuality() {
-      for (let i = 0; i < this.items.length; i++) {
-        if (
-          this.items[i].name != "brie" &&
-          this.items[i].name != "backstage_passes"
-        ) {
-          if (this.items[i].quality > 0) {
-            if (this.items[i].name != "sulfuras") {
-              this.items[i].quality = this.items[i].quality - 1;
-            }
-          }
-        } else {
-          if (this.items[i].quality < 50) {
-            this.items[i].quality = this.items[i].quality + 1;
-            if (
-              this.items[i].name == "backstage_passes"
-            ) {
-              if (this.items[i].sellIn < 11) {
-                if (this.items[i].quality < 50) {
-                  this.items[i].quality = this.items[i].quality + 1;
-                }
-              }
-              if (this.items[i].sellIn < 6) {
-                if (this.items[i].quality < 50) {
-                  this.items[i].quality = this.items[i].quality + 1;
-                }
-              }
-            }
-          }
-        }
-        if (this.items[i].name != "sulfuras") {
-          this.items[i].sellIn = this.items[i].sellIn - 1;
-        }
-        if (this.items[i].sellIn < 0) {
-          if (this.items[i].name != "brie") {
-            if (
-              this.items[i].name != "backstage_passes"
-            ) {
-              if (this.items[i].quality > 0) {
-                if (this.items[i].name != "sulfuras") {
-                  this.items[i].quality = this.items[i].quality - 1;
-                }
-              }
-            } else {
-              this.items[i].quality =
-                this.items[i].quality - this.items[i].quality;
-            }
-          } else {
-            if (this.items[i].quality < 50) {
-              this.items[i].quality = this.items[i].quality + 1;
-            }
-          }
-        }
+    getNewQualityBRIE({quality}) {
+      return quality + QUALITY_DELTA;
+    }
+    getNewQualitySULFURAS({quality}) {
+      return quality;
+    }
+    getNewQualityBACKSTAGE_PASSES({sellIn, quality}) {
+      if (sellIn === EXPIRED_SELL_IN) {
+        return QUALITY_LOWER_LIMIT
+      } else if (sellIn <= veryHighQualityPassesSellIn) {
+        return quality + veryHighQualityMultiplier * QUALITY_DELTA
+      } else if (sellIn <= highQualityPassesSellIn) {
+        return quality + highQualityMultiplier * QUALITY_DELTA
+      } else {
+        return quality + QUALITY_DELTA
       }
-  
-      return this.items;
-    } */
+    }
+    getNewQualityDEFAULT({sellIn, quality, delta = QUALITY_DELTA}) {
+      if (sellIn === 0) {
+        return quality - delta * 2
+      } else {
+        return quality - delta;
+      }
+    }
+    getNewQualityCONJURED({sellIn, quality}) {
+      return this.getNewQualityDEFAULT({sellIn, quality, delta: QUALITY_DELTA * conjuredMultiplier})
+    }
+    getNewSellIn(sellIn) {
+      if (sellIn - 1 >= EXPIRED_SELL_IN) {
+        return sellIn - SELLIN_DELTA;
+      }
+
+      return sellIn
+    }
     updateQuality() {
       this.items = this.items.map(({sellIn, quality, name}) => {
+        const methodName = `getNewQuality${NAMES[name] ?? 'DEFAULT'}`;
         const newItem = {
           name,
-          sellIn, 
-          quality,
+          sellIn: this.getNewSellIn(sellIn),
+          quality: this[methodName]({sellIn, quality})
         };
-
-        if (sellIn - 1 >= EXPIRED_SELL_IN) {
-          newItem.sellIn -= SELLIN_DELTA;
-        }
-
-        switch (name) {
-          case NAMES.BRIE:
-            newItem.quality = quality + QUALITY_DELTA
-            break;
-          case NAMES.SULFURAS:
-            break;
-          case NAMES.BACKSTAGE_PASSES:
-            if (sellIn === EXPIRED_SELL_IN) {
-              newItem.quality = QUALITY_LOWER_LIMIT
-            } else if (sellIn <= veryHighQualitPassesSellIn) {
-              newItem.quality += veryHighQualitMultiplier * QUALITY_DELTA
-            } else if (sellIn <= highQualityPassesSellIn) {
-              newItem.quality += highQualityMultiplier * QUALITY_DELTA
-            } else {
-              newItem.quality += QUALITY_DELTA
-            }
-            break;
-          case NAMES.CONJURED:
-            if (sellIn === 0) {
-              newItem.quality = quality - conjuredMultiplier * QUALITY_DELTA * 2
-            } else {
-              newItem.quality = quality - conjuredMultiplier * QUALITY_DELTA;
-            }
-            break;
-          default:
-            if (sellIn === 0) {
-              newItem.quality = quality - QUALITY_DELTA * 2
-            } else {
-              newItem.quality = quality - QUALITY_DELTA;
-            }
-            break;
-        }
 
         if (!this._isQualityValid(newItem.quality)) {
           newItem.quality = quality;
